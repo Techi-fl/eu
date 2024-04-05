@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bot do Telegram</title>
+    <style>
+        .chatContainer {
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat IDs do Telegram</h1>
+    <div id="chatContainer"></div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const botToken = '6344501279:AAHzgLFPuvJy801wxsXCmDENuJSB18FlHPo';
+
+        // Objeto para armazenar as mensagens de cada chat ID
+        const messages = {};
+
+        // URL do seu bot para receber as mensagens
+        const botUrl = https://api.telegram.org/bot${botToken}/getUpdates;
+
+        // Recebe as mensagens do bot
+        function getBotMessages() {
+            fetch(botUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const newMessages = data.result;
+                    newMessages.forEach(message => {
+                        if (message.message && message.message.chat && message.message.chat.id) {
+                            const chatId = message.message.chat.id;
+                            if (!messages[chatId]) {
+                                messages[chatId] = [];
+                                createChatContainer(chatId);
+                            }
+                            const text = message.message.text || message.message.caption || '';
+                            if (!messages[chatId].find(msg => msg.text === text)) {
+                                messages[chatId].push({ type: 'received', text });
+                                updateChatContainer(chatId);
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Erro ao buscar mensagens do bot:', error));
+        }
+
+        // Cria uma div para um novo chat ID
+        function createChatContainer(chatId) {
+            const chatDiv = document.createElement('div');
+            chatDiv.classList.add('chatContainer');
+            chatDiv.dataset.chatId = chatId;
+            chatDiv.innerHTML = <h2>Chat ID: ${chatId}</h2><div class="messages"></div><input type="text" class="messageInput" placeholder="Digite sua mensagem"><button class="sendMessageBtn">Enviar</button>;
+            chatContainer.appendChild(chatDiv);
+
+            // Adiciona evento de envio de mensagem
+            const sendMessageBtn = chatDiv.querySelector('.sendMessageBtn');
+            const messageInput = chatDiv.querySelector('.messageInput');
+            sendMessageBtn.addEventListener('click', () => {
+                const message = messageInput.value;
+                if (message.trim() !== '') {
+                    sendMessage(chatId, message);
+                    messageInput.value = '';
+                }
+            });
+        }
+
+        // Atualiza a div de mensagens de um chat ID
+        function updateChatContainer(chatId) {
+            const chatDiv = document.querySelector(.chatContainer[data-chat-id="${chatId}"]);
+            const messagesDiv = chatDiv.querySelector('.messages');
+            messagesDiv.innerHTML = messages[chatId].map(msg => <div>${msg.type === 'received' ? 'Recebido' : 'Enviado'}: ${msg.text}</div>).join('');
+        }
+
+        // Envia uma mensagem para o chat ID especificado
+        function sendMessage(chatId, message) {
+            fetch(https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)})
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.ok) {
+                        alert('Erro ao enviar mensagem.');
+                    } else {
+                        messages[chatId].push({ type: 'sent', text: message });
+                        updateChatContainer(chatId);
+                    }
+                })
+                .catch(error => console.error('Erro ao enviar mensagem:', error));
+        }
+
+        setInterval(getBotMessages, 2000); // Atualiza as mensagens a cada 2 segundos
+    </script>
+</body>
+</html>
