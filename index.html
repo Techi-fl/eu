@@ -1,96 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Bot do Telegram</title>
-    <style>
-        .chatContainer {
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            padding: 10px;
-        }
-    </style>
-</head>
+<header>
+  <meta charset="UTF-8">
+  <style>
+    body{
+      font-size:1.2em;
+      font-family: Sans-Serif, Arial, Tahoma;
+      text-align: center;
+    }
+  </style>
+</header>
 <body>
-    <h1>Chat secreto</h1>
-    <div id="chatContainer"></div>
-
-    <script>
-        const chatContainer = document.getElementById('chatContainer');
-        const botToken = '6344501279:AAHzgLFPuvJy801wxsXCmDENuJSB18FlHPo';
-
-        // Objeto para armazenar as mensagens de cada chat ID
-        const messages = {};
-
-        // URL do seu bot para receber as mensagens
-        const botUrl = https://api.telegram.org/bot${botToken}/getUpdates;
-
-        // Recebe as mensagens do bot
-        function getBotMessages() {
-            fetch(botUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const newMessages = data.result;
-                    newMessages.forEach(message => {
-                        if (message.message && message.message.chat && message.message.chat.id) {
-                            const chatId = message.message.chat.id;
-                            if (!messages[chatId]) {
-                                messages[chatId] = [];
-                                createChatContainer(chatId);
-                            }
-                            const text = message.message.text || message.message.caption || '';
-                            if (!messages[chatId].find(msg => msg.text === text)) {
-                                messages[chatId].push({ type: 'received', text });
-                                updateChatContainer(chatId);
-                            }
-                        }
-                    });
-                })
-                .catch(error => console.error('Erro ao buscar mensagens do bot:', error));
-        }
-
-        // Cria uma div para um novo chat ID
-        function createChatContainer(chatId) {
-            const chatDiv = document.createElement('div');
-            chatDiv.classList.add('chatContainer');
-            chatDiv.dataset.chatId = chatId;
-            chatDiv.innerHTML = <h2>Chat ID: ${chatId}</h2><div class="messages"></div><input type="text" class="messageInput" placeholder="Digite sua mensagem"><button class="sendMessageBtn">Enviar</button>;
-            chatContainer.appendChild(chatDiv);
-
-            // Adiciona evento de envio de mensagem
-            const sendMessageBtn = chatDiv.querySelector('.sendMessageBtn');
-            const messageInput = chatDiv.querySelector('.messageInput');
-            sendMessageBtn.addEventListener('click', () => {
-                const message = messageInput.value;
-                if (message.trim() !== '') {
-                    sendMessage(chatId, message);
-                    messageInput.value = '';
-                }
-            });
-        }
-
-        // Atualiza a div de mensagens de um chat ID
-        function updateChatContainer(chatId) {
-            const chatDiv = document.querySelector(.chatContainer[data-chat-id="${chatId}"]);
-            const messagesDiv = chatDiv.querySelector('.messages');
-            messagesDiv.innerHTML = messages[chatId].map(msg => <div>${msg.type === 'received' ? 'Recebido' : 'Enviado'}: ${msg.text}</div>).join('');
-        }
-
-        // Envia uma mensagem para o chat ID especificado
-        function sendMessage(chatId, message) {
-            fetch(https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)})
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.ok) {
-                        alert('Erro ao enviar mensagem.');
-                    } else {
-                        messages[chatId].push({ type: 'sent', text: message });
-                        updateChatContainer(chatId);
-                    }
-                })
-                .catch(error => console.error('Erro ao enviar mensagem:', error));
-        }
-
-        setInterval(getBotMessages, 2000); // Atualiza as mensagens a cada 2 segundos
-    </script>
+  <h1>sobre</h1>
+  apenas leia com atenção, acho que isso vai deixar tudo mais obvio. Arraste para baixo
+  
+  <h1>bem-vinda</h1>
+  se você está vendo isso, é porque realmente é para você. Apenas continue lendo.
+  
+  <h1>mantenha o sigilo</h1>
+  <ol>
+    <li>Não fale a ninguém sobre isso.</li>
+    <li>Não comente com outras pessoas</li>
+    <li>Quero que apenas você veja isso, confio em você..</li>
+  </ol>
+  
+  <h1>história</h1>
+  Na pandemia quando as aulas eram EAD, você era mais presente. Até hoje me lembro de uma brincadeira kkk sinto falta desse tempo. Seria legal se eu podesse ser mais direto. Eu sempre sonho com aquelas brincadeiras... Uma vez você falou uma frase "deixa eu ver, faço o que você quiser", espero que lembre dessa frase, aqueles momentos eram tão bons.. Seria melhor se estivessemos a sos.. 
+  
+  <h1>parte 2</h1>
+  posso contar com você? Eu pedi para você baixar o telegram porque por lá é mais seguro de contar... Mas ultimamente ando tendo sonhos com você. 🙊 Me perdoa, e ta tudo bem se deixar de falar comigo. Só quero tirar esse peso de pensar e sonhar com você, de lembrar daqueles momentos...
+  
+  <h1>Não posso dar detalhes..</h1>
+  <ul>
+    <li> Só posso falar sobre esses assuntos em um lugar seguro.</li>
+    <li>me desculpa se isso for chato, já tem um tempo..</li>
+    <li>queria muito falar com você pessoalmente, mas sem minha irmã ficar o tempo todo em cima.</li>
+    <li>Esse texto não vai ficar muito tempo disponível</li>
+    <li>posso explicar tudo no telegram se você quiser, e se quiser deixar uma mensagem, continue vendo as atualizações nos status</li>
+  </ul>
 </body>
-</html>
