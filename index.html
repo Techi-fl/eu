@@ -1,13 +1,207 @@
-<header>
-  <meta charset="UTF-8">
-  <style>
-    body{
-      font-size:1.2em;
-      font-family: Sans-Serif, Arial, Tahoma;
-      text-align: center;
-    }
-  </style>
-</header>
-<body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo Matemático</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+}
 
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2em; /* Aumenta o tamanho da fonte do título */
+}
+
+button {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 5px 10px;
+    padding: 10px;
+    font-size: 1.5em; /* Aumenta o tamanho da fonte das alternativas */
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button.correct {
+    background-color: #28a745; /* Verde para resposta correta */
+}
+
+button.incorrect {
+    background-color: #dc3545; /* Vermelho para resposta incorreta */
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Jogo Matemático</h1>
+    <p id="nivel">Nível: X</p>
+    <p id="pergunta"></p>
+    <div id="alternativas"></div>
+    <p id="resultado"></p>
+    <p id="pontuacao">Pontuação: 0</p>
+</div>
+
+<script>
+var pontuacao = 0;
+var respostaCorreta;
+var nivel = ['X', 'Y', 'Z'];
+var nivelAtual;
+var termosProgressao = [];
+
+function gerarNivel() {
+    var novoNivel = nivel[Math.floor(Math.random() * nivel.length)];
+    while (novoNivel === nivelAtual) {
+        novoNivel = nivel[Math.floor(Math.random() * nivel.length)];
+    }
+    nivelAtual = novoNivel;
+    return nivelAtual;
+}
+
+function gerarPergunta() {
+    var operacoes = ['+', '-', '*', '/', 'porcentagem', 'progressao'];
+    var operacao = operacoes[Math.floor(Math.random() * operacoes.length)];
+    var numero1, numero2, resposta, sinal;
+    
+    switch (operacao) {
+        case '+':
+            numero1 = Math.floor(Math.random() * 999) + 1;
+            numero2 = Math.floor(Math.random() * 999) + 1;
+            resposta = numero1 + numero2;
+            sinal = '+';
+            break;
+        case '-':
+            numero1 = Math.floor(Math.random() * 999) + 1;
+            numero2 = Math.floor(Math.random() * 999) + 1;
+            if (numero1 < numero2) {
+                var temp = numero1;
+                numero1 = numero2;
+                numero2 = temp;
+            }
+            resposta = numero1 - numero2;
+            sinal = '-';
+            break;
+        case '*':
+            numero1 = Math.floor(Math.random() * 99) + 1;
+            numero2 = Math.floor(Math.random() * 9) + 1;
+            resposta = numero1 * numero2;
+            sinal = '×';
+            break;
+        case '/':
+            numero2 = Math.floor(Math.random() * 9) + 1;
+            numero1 = numero2 * (Math.floor(Math.random() * 99) + 1);
+            resposta = numero1 / numero2;
+            sinal = '÷';
+            break;
+        case 'porcentagem':
+            numero1 = Math.floor(Math.random() * 999) + 1;
+            numero2 = Math.floor(Math.random() * 100) + 1;
+            resposta = (numero1 * numero2) / 100;
+            sinal = '';
+            break;
+        case 'progressao':
+            var inicio = Math.floor(Math.random() * 20) + 1; // Número aleatório entre 1 e 20
+            var razao = Math.floor(Math.random() * 4) + 1; // Razão aleatória entre 1 e 4
+            termosProgressao = [inicio, inicio + razao, inicio + 2 * razao];
+            resposta = inicio + 3 * razao;
+            sinal = '';
+            break;
+        default:
+            resposta = "Erro";
+            sinal = '';
+    }
+
+    respostaCorreta = resposta;
+    return {
+        pergunta: operacao === 'porcentagem' ? numero2 + "% de " + numero1 : 
+                  operacao === 'progressao' ? "Qual é o próximo termo da progressão: " + termosProgressao.join(", ") + ", ...?" :
+                  numero1 + " " + sinal + " " + numero2 + " = ?",
+        respostaCorreta: resposta
+    };
+}
+
+function embaralharArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+function gerarAlternativas(respostaCorreta) {
+    var alternativas = [respostaCorreta];
+    while (alternativas.length < 4) {
+        var novaAlternativa = respostaCorreta + Math.floor(Math.random() * 10) - 5; // Gerar uma alternativa próxima à resposta correta
+        if (alternativas.indexOf(novaAlternativa) === -1) {
+            alternativas.push(novaAlternativa);
+        }
+    }
+    return embaralharArray(alternativas);
+}
+
+function verificarResposta(respostaUsuario) {
+    var btns = document.querySelectorAll("#alternativas button");
+    btns.forEach(function(btn) {
+        btn.disabled = true;
+        if (parseFloat(btn.innerText.split(")")[1]) === respostaCorreta) {
+            btn.className = "correct";
+        } else {
+            btn.className = "incorrect";
+        }
+    });
+    if (parseFloat(respostaUsuario) === respostaCorreta) {
+        pontuacao++;
+        document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao;
+        document.getElementById("resultado").innerText = "Correto!";
+    } else {
+        pontuacao--;
+        document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao;
+        document.getElementById("resultado").innerText = "Incorreto. A resposta era: " + respostaCorreta;
+    }
+    setTimeout(function() {
+        document.getElementById("resultado").innerText = "";
+        atualizarPergunta();
+    }, 1000);
+}
+
+function atualizarPergunta() {
+    document.getElementById("nivel").innerText = "Nível: " + gerarNivel();
+    var pergunta = gerarPergunta();
+    document.getElementById("pergunta").innerText = pergunta.pergunta;
+    var alternativas = gerarAlternativas(pergunta.respostaCorreta);
+    var letras = ['A', 'B', 'C', 'D'];
+    var alternativasDiv = document.getElementById("alternativas");
+    alternativasDiv.innerHTML = "";
+    for (var i = 0; i < alternativas.length; i++) {
+        var btn = document.createElement("button");
+        btn.innerText = letras[i] + ") " + alternativas[i];
+        btn.onclick = function() {
+            verificarResposta(this.innerText.split(")")[1].trim());
+        };
+        alternativasDiv.appendChild(btn);
+    }
+}
+
+// Inicializa o jogo
+atualizarPergunta();
+
+</script>
 </body>
+</html>
